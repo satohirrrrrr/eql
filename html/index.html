@@ -5,9 +5,9 @@
     <meta charaset="utf-8">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
            integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
   </head>
   <body>
     <div class="container">
@@ -91,80 +91,6 @@
         })
       </script>
 
-      <!-- jQuery -->
-      <section>
-        <h3 class="pt-5">jQuery</h3>
-        <div class="table-responsive">
-          <table class="table table-striped" id="jquery">
-            <thead>
-              <tr>
-                <th></th>
-                <th>行番号</th>
-                <th>社員番号</th>
-                <th>氏名</th>
-                <th>戦闘力</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- 入力行 -->
-              <tr class="table-primary new-employee-form">
-                <td>
-                  <button class="btn btn-success rounded-circle p-0" onclick="append()">+</button>
-                  <button class="btn btn-dark rounded-circle p-0" onclick="fillFormRandomAndAppend()">R</button>
-                </td>
-                <td></td>
-                <td><input class="form-control" type="text" name="empNo"></input></td>
-                <td><input class="form-control" type="text" name="name"></input></td>
-                <td><input class="form-control" type="number" name="power"></input></td>
-              </tr>
-              <!-- 複製用 非表示行-->
-              <tr class="template">
-                <td><button class="btn btn-danger rounded-circle p-0" onclick="remove(event)">-</button></td>
-                <td class="rowNum"></td>
-                <td class="empNo"></td>
-                <td class="name"></td>
-                <td class="power"></td>
-              </tr>  
-            </tbody>
-          </table>
-        </div>
-      </section>
-      <script>
-        function remove(event) {
-          event.target.closest('tr').remove()
-          numberingRowNum()
-        }
-        function append() {
-          const empNo = $('input[name="empNo"]').val()
-          const name = $('input[name="name"]').val()
-          const power = $('input[name="power"]').val()
-          $('input[name="empNo"]').val('')
-          $('input[name="name"]').val('')
-          $('input[name="power"]').val('')
-          $('#jquery tbody').append(createNewRow(empNo, name, power))
-          numberingRowNum()
-        }
-        function fillFormRandomAndAppend() {
-          const empNo = 't' + ('0000' + Math.floor(Math.random() * 10000)).slice(-4)
-          const name = Math.random().toString(36).slice(-8)
-          const power = Math.floor( Math.random() * 10000)
-          $('#jquery tbody').append(createNewRow(empNo, name, power))
-          numberingRowNum()
-        }
-        function createNewRow(empNo, name, power) {
-          const newTr = $('#jquery tbody tr.template').clone()
-          newTr.find('.empNo').html(empNo)
-          newTr.find('.name').html(name)
-          newTr.find('.power').html(power)
-          newTr.removeAttr('class')
-          return newTr
-        }
-        function numberingRowNum() {
-          $("#jquery tbody tr:not([class])").each((i, el) => {
-            $(el).find(".rowNum").html(i + 1)
-          })
-        }
-      </script>
     </div>
   </body>
 </html>
