@@ -9,38 +9,54 @@
     <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
   </head>
   <body>
-    <!-- Vuetify -->
     <div id="app">
-      <!-- Vuetify を使う場合に全体を<v-app>でwrapする必要がある -->
       <v-app>
-        <v-form ref="form" v-model="valid" lazy-validation>
-          <v-container>
-            <h2 class="pt-5">EQL</h2>
-            <v-layout>
-              <v-flex xs12 md12>
-                <v-btn color="green" :dark="valid" small fab @click="addPerson" :disabled="!valid">
-                  <v-icon>person_add</v-icon>
-                </v-btn>
-              </v-flex>
-            </v-layout>
-          </v-container>
-        </v-form>
-        <v-container>
-          <v-data-iterator :items="elements" :rows-per-page-items="rowsPerPageItems" :pagination.sync="pagination" content-tag="v-layout" row wrap>
-            <template v-slot:items="props">
+        <v-container grid-list-md>
+          <v-layout pb-4>
+            <v-flex xs1 md1>
+              <v-btn color="green" dark small fab @click.stop="dialog=true">
+                <v-icon>person_add</v-icon>
+              </v-btn>
+            </v-flex>
+            <v-flex xs6 md6>
+              総計：{{ totalPrice }} 円
+            </v-flex>
+            <v-flex xs5 md5>
+              平均：{{ averagePrice }} 円
+            </v-flex>
+          </v-layout>
+          <v-data-iterator :items="elements" :pagination.sync="pagination" content-tag="v-layout" row wrap>
+            <template v-slot:item="props">
               <v-flex xs12 sm6 md4 lg3>
-                <v-card>
-                  <v-card-title>
-                    <h4>{{ props.item.name }}</h4>
-                    <v-btn color="red" icon dark small @click="removePerson(props.item.id)">
-                      <v-icon>clear</v-icon>
-                    </v-btn>
+                <v-card :dark="props.item.done">
+                  <v-card-title class="headline">
+                    {{ props.item.name }}
+                    <v-layout justify-end>
+                      <v-btn icon small @click="done(props.item.id)">
+                        <v-icon color="green">{{ doneIcon(props.item.done) }}</v-icon>
+                      </v-btn>
+                      <v-btn icon small @click="editModal(props.item.id)" :disabled="props.item.done">
+                        <v-icon color="blue">edit</v-icon>
+                      </v-btn>
+                      <v-btn icon small @click="remove(props.item.id)" :disabled="props.item.done">
+                        <v-icon color="red">clear</v-icon>
+                      </v-btn>
+                    </v-layout>
                   </v-card-title>
                   <v-divider></v-divider>
                   <v-list dense>
+                    <v-list-tile v-for="(el, i) in props.item.contents">
+                      <v-list-tile-content>{{ el.category }}</v-list-tile-content>
+                      <v-list-tile-content class="align-end">{{ el.price }} 円</v-list-tile-content>
+                    </v-list-tile>
+                    <v-divider></v-divider>
                     <v-list-tile>
-                      <v-list-tile-content>Category</v-list-tile-content>
-                      <v-list-tile-content class="align-end">{{ props.item.category }}</v-list-tile-content>
+                      <v-list-tile-content>小計</v-list-tile-content>
+                      <v-list-tile-content class="align-end">{{ subtotal(props.item.contents) }} 円</v-list-tile-content>
+                    </v-list-tile>
+                    <v-list-tile>
+                      <v-list-tile-content>清算</v-list-tile-content>
+                      <v-list-tile-content class="align-end">{{ liquidate(props.item.contents) }} 円</v-list-tile-content>
                     </v-list-tile>
                   </v-list>
                 </v-card>
@@ -48,63 +64,169 @@
             </template>
           </v-data-iterator>
         </v-container>
+        <!-- モーダル -->
+        <v-dialog v-model="dialog" width="600" persistent>
+          <v-card>
+            <v-card-title class="headline">
+              New Card
+              <v-layout justify-end>
+                <v-btn color="gray" icon @click="closeModal">
+                  <v-icon>
+                    close
+                  </v-icon>
+                </v-btn>
+              </v-layout>
+            </v-card-title>
+            <v-form ref="form" v-model="valid" lazy-validation>
+              <v-container>
+                <v-layout>
+                  <v-flex xs12 md12>
+                    <v-text-field v-model="name" :counter="10" label="name"></v-text-field>
+                  </v-flex>
+                </v-layout>
+                <v-layout row wrap v-for="(el, i) in contents">
+                  <v-flex xs12 md6>
+                    <v-text-field v-model="el.category" :counter="10" label="category"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 md6>
+                    <v-text-field v-model="el.price" :counter="10" label="price"></v-text-field>
+                  </v-flex>
+                </v-layout>
+                <v-layout>
+                  <v-flex xs12 md12>
+                    <v-btn color="green" icon small dark @click="addContent">
+                      <v-icon>add</v-icon>
+                    </v-btn>
+                  </v-flex>
+                </v-layout>
+              <v-card-actoins>
+                <v-btn color="blue" dark @click="addOrEdit">OK</v-btn>
+              </v-card-actoins>
+            </v-container>
+            </v-form>
+          </v-card>
+        </v-dialog>
       </v-app>
     </div>
     <script>
       new Vue({
         el: '#app',
         data: {
+          dialog: false,
           valid: true,
-          rowsPerPageItems: [10, 20, 50],
           pagination: {
             rowsPerPage: 10
           },
-          elements: [
+          id: null,
+          name: '',
+          contents: [
             {
-              id: 1,
-              name: 'sato',
-              category: 'transition'
-           },
-           {
-              id: 2,
-              name: 'sato',
-              category: 'transition'
-           },
-           {
-              id: 3,
-              name: 'sato',
-              category: 'transition'
-           },
-           {
-              id: 4,
-              name: 'sato',
-              category: 'transition'
-           },
-           {
-              id: 5,
-              name: 'sato',
-              category: 'transition'
-           },
-           {
-              id: 6,
-              name: 'sato',
-              category: 'transition'
-           },
-          ]
+              category: '',
+              price: null
+            }
+          ],
+          elements: []
+            // {
+            //   id: 1,
+            //   name: 'sato',
+            //   done: false,
+            //   contents: [
+            //     {
+            //       category: 'aaa',
+            //       price: 1111
+            //     },
+            //     {
+            //       category: 'bbb',
+            //       price: 2222
+            //     },
+            //   ],
+            // }
+          // ]
         },
         methods: {
-          addPerson: function() {
-            alert("append")
+          closeModal: function() {
+            this.resetForm()
+            this.dialog = false
           },
-          removePerson: function(id) {
+          addOrEdit: function() {
+            if (this.id) {
+              const el = this.elements.find(item => item.id === this.id)
+              el.name = this.name
+              el.contents = this.contents
+              el.done = false
+            } else {
+              this.elements.push({
+                id: this.generateElId(),
+                name: this.name,
+                contents: this.contents,
+                done: false
+              })
+            }
+            this.closeModal()
+          },
+          remove: function(id) {
             const index = this.elements.findIndex(item => item.id === id)
             this.elements.splice(index, 1)
+          },
+          editModal: function(id) {
+            const el = this.elements.find(item => item.id === id)
+            this.id = el.id
+            this.name = el.name
+            this.contents = el.contents
+            this.dialog = true
+          },
+          done: function(id) {
+            const el = this.elements.find(item => item.id === id)
+            el.done = !el.done
           },
           generateElId: function() {
             const d = new Date()
             return d.getMinutes() + d.getSeconds() + d.getMilliseconds()
           },
+          resetForm: function() {
+            this.id = null
+            this.name = ''
+            this.contents = [
+              {
+                category: '',
+                price: null
+              }
+            ]
+          },
+          subtotal: function(contents) {
+            return contents.reduce((sum, content) => sum + Number(content.price), 0)
+          },
+          liquidate: function(contents) {
+            return contents.reduce((sum, content) => sum + Number(content.price), 0) - this.averagePrice
+          },
+          doneIcon: function(done) {
+            return done ? "check_box" : "check_box_outline_blank"
+          },
+          addContent: function() {
+            this.contents.push({
+              category: '',
+              price: null
+            })
+          }
         },
+        computed: {
+          totalPrice: function() {
+            if (this.elements.length > 0) {
+              let total = 0
+              this.elements.forEach(function(el) {
+                total = total + el.contents.reduce((sum, content) => sum + Number(content.price), 0)
+              })
+              return total
+            }
+            return 0
+          },
+          averagePrice: function() {
+            if (this.elements.length > 0) {
+              return this.totalPrice / this.elements.length
+            }
+            return 0
+          },
+        }
       })
     </script>
   </body>
