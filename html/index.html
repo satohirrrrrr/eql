@@ -3,109 +3,123 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charaset="utf-8">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
-           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
   </head>
   <body>
-    <div class="container">
-      <!-- Vue -->
-      <section id="app">
-        <h3 class="pt-5">Vue</h3>
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th></th>
-                <th>行番号</th>
-                <th>社員番号</th>
-                <th>氏名</th>
-                <th>戦闘力</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- 入力行 -->
-              <tr class="table-success">
-                <td>
-                  <button class="btn btn-success rounded-circle p-0" @click="append">+</button>
-                  <button class="btn btn-dark rounded-circle p-0" @click="fillFormRandomAndAppend">R</button>
-                </td>
-                <td></td>
-                <td><input class="form-control" type="text" v-model="empNo"></input></td>
-                <td><input class="form-control" type="text" v-model="name"></input></td>
-                <td><input class="form-control" type="number" v-model="power"></input></td>
-              </tr>
-              <!-- 行数合わせのダミー行 -->
-              <tr calss="template"></tr>
-              <!-- 表示行 -->
-              <tr v-for="(el, i) in elements">
-                <td><button class="btn btn-danger rounded-circle p-0" @click="remove(i)">-</button></td>
-                <td>{{ i + 1 }}</td>
-                <td>{{ el.empNo }}</td>
-                <td>{{ el.name }}</td>
-                <td>{{ el.power }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-      <script>
-        new Vue({
-          el: '#app',
-          data: {
-            empNo: '',
-            name: '',
-            power: '',
-            elements: []
-          },
-          methods: {
-            append: function() {
-              this.elements.push({
-                empNo: this.empNo,
-                name : this.name,
-                power: this.power
-              })
-              this.clearData()
-            },
-            remove: function(i) {
-              this.elements.splice(i, 1)
-            },
-            fillFormRandomAndAppend: function() {
-              this.elements.push({
-                empNo: 't' + ('0000' + Math.floor(Math.random() * 10000)).slice(-4),
-                name : Math.random().toString(36).slice(-8),
-                power: Math.floor( Math.random() * 10000)
-              })
-            },
-            clearData: function() {
-              this.empNo = ''
-              this.name = ''
-              this.power = ''
-            },
-          },
-          // watch: {
-          //   'elements': 'clearData',
-          // },
-        })
-      </script>
-
+    <!-- Vuetify -->
+    <div id="app">
+      <!-- Vuetify を使う場合に全体を<v-app>でwrapする必要がある -->
+      <v-app>
+        <!-- ref属性は、親コンポーネント.$refsオブジェクトに参照を登録する。this.$refs.form.validate()と書いて、フォームバリデーションする。 -->
+        <!-- v-modelにより、dataプロパティに定義したvalid(formの入力が全て有効かどうかのフラグ値)をバインディングする。 -->
+        <!-- lazy-validationを有効にしないと、初期表示時の未入力状態でvalidionが実行されてしまう。 -->
+        <v-form ref="form" v-model="valid" lazy-validation>
+          <v-container>
+            <h2 class="pt-5">Vuetify</h2>
+            <v-layout>
+              <v-flex xs12 md2>
+                <v-text-field v-model="empNo" :counter="5" label="社員番号" :rules="empNoRule"></v-text-field>
+              </v-flex>
+              <v-flex xs12 md5>
+                <v-text-field v-model="name" :counter="8" label="氏名" :rules="nameRule"></v-text-field>
+              </v-flex>
+              <v-flex xs12 md3>
+                <v-text-field v-model="power" :counter="10" label="戦闘力" :rules="powerRule"></v-text-field>
+              </v-flex>
+              <v-flex xs12 md2>
+                <!-- darkはダークテーマを適用する。ただ、disabledがtrueだとボタンが消えるので、:dark="valid"と書くとボタンは消えず非活性となる。 -->
+                <v-btn color="green" :dark="valid" small fab @click="append" :disabled="!valid">
+                  <v-icon>add</v-icon>
+                </v-btn>
+                <v-btn dark small fab @click="fillFormRandomAndAppend">
+                  R
+                </v-btn>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-form>
+        <v-container>
+          <v-data-table :headers="headers" :items="elements" class="elevation-1">
+            <template v-slot:no-data>
+              <v-alert :value="true" color="error" icon="warning">
+                Nothing to display here...
+              </v-alert>
+            </template>
+            <template v-slot:items="props">
+              <td><v-btn color="red" dark small fab @click.native="remove(props.item.id)">
+                <v-icon>remove</v-icon>
+              </v-btn></td>
+              <td class="text-xs-left">{{ props.item.empNo }}</td>
+              <td class="text-xs-left">{{ props.item.name }}</td>
+              <td class="text-xs-left">{{ props.item.power }}</td>
+            </template>
+          </v-data-table>
+        </v-container>
+      </v-app>
     </div>
+    <script>
+      new Vue({
+        el: '#app',
+        data: {
+          valid: true,
+          empNo: '',
+          name: '',
+          power: '',
+          headers: [
+            {text: '', sortable: false, value: '', width: '10%' },
+            {text: '社員番号', sortable: true, value: 'empNo', width: '20%'},
+            {text: '氏名', sortable: true, value: 'name', width: '45%'},
+            {text: '戦闘力', sortable: true, value: 'power', width: '25%'},
+          ],
+          elements: [],
+          empNoRule: [
+            v => !!v || 'is required',
+            v => /^t\d{4}$/.test(v) || 'must be /^t\\d{4}$/'
+          ],
+          nameRule: [
+            v => !!v || 'is required',
+            v => (v && v.length <= 8) || 'must be less than 8 characters'
+          ],
+          powerRule: [
+            v => !!v || 'is required',
+            v => /^[1-9]\d{0,9}$/.test(v) || 'must be /^[1-9]\\d{0,9}$/'
+          ],
+        },
+        methods: {
+          append: function() {
+            // フォームバリデーションを実行
+            if (!this.$refs.form.validate()) {
+              return false;
+            }
+            this.elements.push({
+              id: this.generateElId(), // sort表示中は行番号と要素インデックスが一致しないため、削除行を特定するために必要
+              empNo: this.empNo,
+              name : this.name,
+              power: this.power
+            })
+            this.$refs.form.reset()
+          },
+          remove: function(id) {
+            const index = this.elements.findIndex(item => item.id === id)
+            this.elements.splice(index, 1)
+          },
+          fillFormRandomAndAppend: function() {
+            this.elements.push({
+              id: this.generateElId(),
+              empNo: 't' + ('0000' + Math.floor(Math.random() * 10000)).slice(-4),
+              name : Math.random().toString(36).slice(-8),
+              power: Math.floor( Math.random() * 10000)
+            })
+          },
+          generateElId: function() {
+            const d = new Date()
+            return d.getMinutes() + d.getSeconds() + d.getMilliseconds()
+          }
+        },
+      })
+    </script>
   </body>
 </html>
-
-<style>
-  .rounded-circle {
-    width: 2rem;
-    height: 2rem;
-  }
-
-  .table-responsive {
-    height: 350px;
-  }
-
-  .template {
-    display: none;
-  }
-</style>
