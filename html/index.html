@@ -3,10 +3,10 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charaset="utf-8">
-    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@1.5.16/dist/vuetify.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@1.5.16/dist/vuetify.js"></script>
   </head>
   <body>
     <div id="app">
@@ -14,7 +14,7 @@
         <v-container grid-list-md>
           <v-layout pb-4>
             <v-flex xs1 md1>
-              <v-btn color="green" dark small fab @click.stop="dialog=true">
+              <v-btn color="green"  small fab @click.stop="dialog=true">
                 <v-icon>person_add</v-icon>
               </v-btn>
             </v-flex>
@@ -30,7 +30,7 @@
           <v-data-iterator :items="elements" :pagination.sync="pagination" content-tag="v-layout" row wrap>
             <template v-slot:item="props">
               <v-flex xs12 sm6 md4 lg3>
-                <v-card :dark="props.item.done">
+                <v-card>
                   <v-card-title class="headline">
                     {{ props.item.name }}
                     <v-layout justify-end>
@@ -88,7 +88,7 @@
                 </v-layout>
                 <v-layout row wrap v-for="(el) in contents" v-bind:key="el.id">
                   <v-flex xs12 md1>
-                    <v-btn color="red" small dark icon @click="removeCategory(id, el.id)">
+                    <v-btn color="red" small  icon @click="removeCategory(id, el.id)">
                       <v-icon>
                         close
                       </v-icon>
@@ -103,13 +103,13 @@
                 </v-layout>
                 <v-layout>
                   <v-flex xs12 md12>
-                    <v-btn color="green" icon small dark @click="addContent">
+                    <v-btn color="green" icon small  @click="addContent">
                       <v-icon>add</v-icon>
                     </v-btn>
                   </v-flex>
                 </v-layout>
               <v-card-actoins>
-                <v-btn color="blue" dark @click="addOrEdit">OK</v-btn>
+                <v-btn color="blue"  @click="addOrEdit">OK</v-btn>
               </v-card-actoins>
             </v-container>
             </v-form>
@@ -206,9 +206,9 @@
           liquidate: function(contents) {
             let result = contents.reduce((sum, content) => sum + Number(content.price), 0) - this.averagePrice
             if (result < 0) {
-              result = '- ' + formatPrice(result * -1)
+              result = '支払 ' + formatPrice(result * -1)
             } else {
-              result = '+ ' + formatPrice(result)
+              result = '受取 ' + formatPrice(result)
             }
             return result
           },
@@ -249,6 +249,7 @@
           },
         }
       })
+      
     </script>
   </body>
 </html>
