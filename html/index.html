@@ -3,183 +3,296 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta charaset="utf-8">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"
-           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify@1.5.16/dist/vuetify.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@1.5.16/dist/vuetify.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+
   </head>
   <body>
-    <div class="container">
-      <!-- Vue -->
-      <section id="app">
-        <h3 class="pt-5">Vue</h3>
-        <div class="table-responsive">
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th></th>
-                <th>行番号</th>
-                <th>社員番号</th>
-                <th>氏名</th>
-                <th>戦闘力</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- 入力行 -->
-              <tr class="table-success">
-                <td>
-                  <button class="btn btn-success rounded-circle p-0" @click="append">+</button>
-                  <button class="btn btn-dark rounded-circle p-0" @click="fillFormRandomAndAppend">R</button>
-                </td>
-                <td></td>
-                <td><input class="form-control" type="text" v-model="empNo"></input></td>
-                <td><input class="form-control" type="text" v-model="name"></input></td>
-                <td><input class="form-control" type="number" v-model="power"></input></td>
-              </tr>
-              <!-- 行数合わせのダミー行 -->
-              <tr calss="template"></tr>
-              <!-- 表示行 -->
-              <tr v-for="(el, i) in elements">
-                <td><button class="btn btn-danger rounded-circle p-0" @click="remove(i)">-</button></td>
-                <td>{{ i + 1 }}</td>
-                <td>{{ el.empNo }}</td>
-                <td>{{ el.name }}</td>
-                <td>{{ el.power }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-      <script>
-        new Vue({
-          el: '#app',
-          data: {
-            empNo: '',
-            name: '',
-            power: '',
-            elements: []
-          },
-          methods: {
-            append: function() {
-              this.elements.push({
-                empNo: this.empNo,
-                name : this.name,
-                power: this.power
-              })
-              this.clearData()
-            },
-            remove: function(i) {
-              this.elements.splice(i, 1)
-            },
-            fillFormRandomAndAppend: function() {
-              this.elements.push({
-                empNo: 't' + ('0000' + Math.floor(Math.random() * 10000)).slice(-4),
-                name : Math.random().toString(36).slice(-8),
-                power: Math.floor( Math.random() * 10000)
-              })
-            },
-            clearData: function() {
-              this.empNo = ''
-              this.name = ''
-              this.power = ''
-            },
-          },
-          // watch: {
-          //   'elements': 'clearData',
-          // },
-        })
-      </script>
+    <div id="app">
+      <v-app>
+        <v-container grid-list-md>
+          <v-layout pb-4>
+            <v-flex xs1 md1>
+              <v-btn dark color="green" small fab @click="dialog=true">
+                <v-icon>person_add</v-icon>
+              </v-btn>
+            </v-flex>
+            <v-flex xs5 md5>
+              <span style="font-size: 20px">総計：</span>
+              <span style="font-size: 30px;">{{ formatPrice(totalPrice) }}</span> 円
+            </v-flex>
+            <v-flex xs5 md5>
+              <span style="font-size: 20px">平均：</span>
+              <span style="font-size: 30px;">{{ formatPrice(averagePrice) }}</span> 円
+            </v-flex>
+            <v-flex xs1 md1>
+              <v-btn dark color="blue" small @click="save">
+                <v-icon>save</v-icon>save
+              </v-btn>
+            </v-flex>
 
-      <!-- jQuery -->
-      <section>
-        <h3 class="pt-5">jQuery</h3>
-        <div class="table-responsive">
-          <table class="table table-striped" id="jquery">
-            <thead>
-              <tr>
-                <th></th>
-                <th>行番号</th>
-                <th>社員番号</th>
-                <th>氏名</th>
-                <th>戦闘力</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- 入力行 -->
-              <tr class="table-primary new-employee-form">
-                <td>
-                  <button class="btn btn-success rounded-circle p-0" onclick="append()">+</button>
-                  <button class="btn btn-dark rounded-circle p-0" onclick="fillFormRandomAndAppend()">R</button>
-                </td>
-                <td></td>
-                <td><input class="form-control" type="text" name="empNo"></input></td>
-                <td><input class="form-control" type="text" name="name"></input></td>
-                <td><input class="form-control" type="number" name="power"></input></td>
-              </tr>
-              <!-- 複製用 非表示行-->
-              <tr class="template">
-                <td><button class="btn btn-danger rounded-circle p-0" onclick="remove(event)">-</button></td>
-                <td class="rowNum"></td>
-                <td class="empNo"></td>
-                <td class="name"></td>
-                <td class="power"></td>
-              </tr>  
-            </tbody>
-          </table>
-        </div>
-      </section>
-      <script>
-        function remove(event) {
-          event.target.closest('tr').remove()
-          numberingRowNum()
-        }
-        function append() {
-          const empNo = $('input[name="empNo"]').val()
-          const name = $('input[name="name"]').val()
-          const power = $('input[name="power"]').val()
-          $('input[name="empNo"]').val('')
-          $('input[name="name"]').val('')
-          $('input[name="power"]').val('')
-          $('#jquery tbody').append(createNewRow(empNo, name, power))
-          numberingRowNum()
-        }
-        function fillFormRandomAndAppend() {
-          const empNo = 't' + ('0000' + Math.floor(Math.random() * 10000)).slice(-4)
-          const name = Math.random().toString(36).slice(-8)
-          const power = Math.floor( Math.random() * 10000)
-          $('#jquery tbody').append(createNewRow(empNo, name, power))
-          numberingRowNum()
-        }
-        function createNewRow(empNo, name, power) {
-          const newTr = $('#jquery tbody tr.template').clone()
-          newTr.find('.empNo').html(empNo)
-          newTr.find('.name').html(name)
-          newTr.find('.power').html(power)
-          newTr.removeAttr('class')
-          return newTr
-        }
-        function numberingRowNum() {
-          $("#jquery tbody tr:not([class])").each((i, el) => {
-            $(el).find(".rowNum").html(i + 1)
-          })
-        }
-      </script>
+          </v-layout>
+          <v-data-iterator :items="elements" :pagination.sync="pagination" content-tag="v-layout" row wrap>
+            <template v-slot:item="props">
+              <v-flex xs12 sm6 md4 lg3>
+                <v-card :dark="props.item.done">
+                  <v-card-title class="headline">
+                    {{ props.item.name }}
+                    <v-layout justify-end>
+                      <v-btn icon small @click="done(props.item.id)">
+                        <v-icon color="green">{{ doneIcon(props.item.done) }}</v-icon>
+                      </v-btn>
+                      <v-btn icon small @click="editModal(props.item.id)" :disabled="props.item.done">
+                        <v-icon color="blue">edit</v-icon>
+                      </v-btn>
+                      <v-btn icon small @click="removeCard(props.item.id)" :disabled="props.item.done">
+                        <v-icon color="red">clear</v-icon>
+                      </v-btn>
+                    </v-layout>
+                  </v-card-title>
+                  <v-divider></v-divider>
+                  <v-list dense>
+                    <v-list-tile v-for="(el) in props.item.contents" v-bind:key="el.id">
+                      <v-list-tile-content>{{ el.category }}</v-list-tile-content>
+                      <v-list-tile-content class="align-end">{{ formatPrice(el.price) }} 円</v-list-tile-content>
+                    </v-list-tile>
+                    <v-divider></v-divider>
+                    <v-list-tile>
+                      <v-list-tile-content><span class="card-footer">小計</span></v-list-tile-content>
+                      <v-list-tile-content class="align-end"><span class="card-footer">{{ formatPrice(subtotal(props.item.contents)) }} 円</span></v-list-tile-content>
+                    </v-list-tile>
+                    <v-list-tile>
+                      <v-list-tile-content><span class="card-footer">清算</span></v-list-tile-content>
+                      <v-list-tile-content class="align-end"><span class="card-footer" :style="highlight(props.item.contents)">{{ liquidate(props.item.contents) }} 円</span></v-list-tile-content>
+                    </v-list-tile>
+                  </v-list>
+                </v-card>
+              </v-flex>
+            </template>
+          </v-data-iterator>
+        </v-container>
+        <!-- モーダル -->
+        <v-dialog v-model="dialog" width="600" persistent>
+          <v-card>
+            <v-card-title class="headline">
+              New Card
+              <v-layout justify-end>
+                <v-btn color="gray" icon @click="closeModal">
+                  <v-icon>
+                    close
+                  </v-icon>
+                </v-btn>
+              </v-layout>
+            </v-card-title>
+            <v-form ref="form" v-model="valid" lazy-validation>
+              <v-container>
+                <v-layout>
+                  <v-flex xs12 md12>
+                    <v-text-field v-model="name" :counter="10" label="name"></v-text-field>
+                  </v-flex>
+                </v-layout>
+                <v-layout row wrap v-for="(el) in contents" v-bind:key="el.id">
+                  <v-flex xs12 md1>
+                    <v-btn dark color="red" small icon @click="removeCategory(id, el.id)">
+                      <v-icon>
+                        close
+                      </v-icon>
+                    </v-btn>
+                  </v-flex>
+                  <v-flex xs12 md6>
+                    <v-text-field v-model="el.category" :counter="10" label="category"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 md5>
+                    <v-text-field v-model="el.price" :counter="10" label="price"></v-text-field>
+                  </v-flex>
+                </v-layout>
+                <v-layout>
+                  <v-flex xs12 md12>
+                    <v-btn dark color="green" icon small  @click="addContent">
+                      <v-icon>add</v-icon>
+                    </v-btn>
+                  </v-flex>
+                </v-layout>
+              <v-card-actoins>
+                <v-btn dark color="blue"  @click="addOrEdit">OK</v-btn>
+              </v-card-actoins>
+            </v-container>
+            </v-form>
+          </v-card>
+        </v-dialog>
+      </v-app>
     </div>
+    <script>
+      const cryptoKey = 'U2FsdGVkX1+PECXJQkZ1pR9cVDGFjzFASkWhk3s5RW1NSkhS3/1SB8PtOB4pARPJZqsSCdxa+HmdELe+Fs1lww=='
+      function formatPrice(price) {
+        return Number(price).toLocaleString()
+      }
+      function generateElId(prefix = '') {
+            const d = new Date()
+            return prefix + d.getMinutes() + d.getSeconds() + d.getMilliseconds()
+      }
+      function copyToClipboard(elements) {
+        // コピーする文字列を仮要素に設定して選択し、クリップボードにコピーした後に仮要素を消す
+        const tmp = document.createElement("div");
+        const span = document.createElement('span');
+        const url = `${location.origin}/${CryptoJS.AES.encrypt(JSON.stringify(elements), cryptoKey)}`
+        tmp.appendChild(span).textContent = url
+        tmp.style.position = 'fixed';
+        tmp.style.right = '200%';
+        document.body.appendChild(tmp);
+        document.getSelection().selectAllChildren(tmp);
+        var result = document.execCommand("copy");
+        document.body.removeChild(tmp);
+        return url
+      }
+      new Vue({
+        el: '#app',
+        data: {
+          dialog: false,
+          valid: true,
+          unitPrice: 1,
+          pagination: {
+            rowsPerPage: 10
+          },
+          id: null,
+          name: '',
+          contents: [
+            {
+              id: null,
+              category: '',
+              price: null
+            }
+          ],
+          elements: []
+        },
+        methods: {
+          addContent: function() {
+            this.contents.push({
+              id: generateElId('c_'),
+              category: '',
+              price: null
+            })
+          },
+          addOrEdit: function() {
+            if (this.id) {
+              const el = this.elements.find(item => item.id === this.id)
+              el.name = this.name
+              el.contents = this.contents
+              el.done = false
+            } else {
+              this.elements.push({
+                id: generateElId('el_'),
+                name: this.name,
+                contents: this.contents,
+                done: false,
+              })
+            }
+            this.closeModal()
+          },
+          closeModal: function() {
+            this.resetForm()
+            this.dialog = false
+          },
+          done: function(id) {
+            const el = this.elements.find(item => item.id === id)
+            el.done = !el.done
+          },
+          doneIcon: function(done) {
+            return done ? "check_box" : "check_box_outline_blank"
+          },
+          editModal: function(id) {
+            const el = this.elements.find(item => item.id === id)
+            this.id = el.id
+            this.name = el.name
+            this.contents = el.contents
+            this.dialog = true
+          },
+          highlight: function(contents) {
+            let result = contents.reduce((sum, content) => sum + Number(content.price), 0) - this.averagePrice
+            if (result < 0) {
+              return 'color: red'
+            }
+            return 'color: green'
+          },
+          liquidate: function(contents) {
+            let result = contents.reduce((sum, content) => sum + Number(content.price), 0) - this.averagePrice
+            if (result < 0) {
+              result = '支払 ' + formatPrice(result * -1)
+            } else {
+              result = '受取 ' + formatPrice(result)
+            }
+            return result
+          },
+          removeCard: function(id) {
+            const index = this.elements.findIndex(item => item.id === id)
+            this.elements.splice(index, 1)
+          },
+          removeCategory: function(id, categoryId) {
+            const contentsIndex = this.contents.findIndex(item => item.id === categoryId)
+            if (contentsIndex <  0) { return false }
+            this.contents.splice(contentsIndex, 1)
+          },
+          resetForm: function() {
+            this.id = null,
+            this.name = ''
+            this.contents = [
+              {
+                id: generateElId('c_'),
+                category: '',
+                price: null
+              }
+            ]
+          },
+          save: function() {
+            const url = copyToClipboard(this.elements).toString()
+            if (!url.match(/amazonaws/)) {
+              return false
+            }
+            location.href = url
+            alert('URLをクリップボードにコピーしました')
+          },
+          subtotal: function(contents) {
+            return contents.reduce((sum, content) => sum + Number(content.price), 0)
+          },
+        },
+        computed: {
+          totalPrice: function() {
+            if (this.elements.length > 0) {
+              let total = 0
+              this.elements.forEach(function(el) {
+                total = total + el.contents.reduce((sum, content) => sum + Number(content.price), 0)
+              })
+              return total
+            }
+            return 0
+          },
+          averagePrice: function() {
+            if (this.elements.length > 0) {
+              return Math.ceil(this.totalPrice / this.elements.length / this.unitPrice) * this.unitPrice
+            }
+            return 0
+          },
+        },
+        created: function() {
+          let pathParameter = location.href.replace(`${location.origin}/`, '')
+          if (!location.href.match(/amazonaws/) || pathParameter === '') {
+            return false
+          }
+          pathParameter = CryptoJS.AES.decrypt(pathParameter, cryptoKey).toString(CryptoJS.enc.Utf8);
+          this.elements = JSON.parse(pathParameter)
+        }
+      })
+      
+    </script>
   </body>
 </html>
-
 <style>
-  .rounded-circle {
-    width: 2rem;
-    height: 2rem;
-  }
-
-  .table-responsive {
-    height: 350px;
-  }
-
-  .template {
-    display: none;
+  .card-footer {
+    font-size: 15px;
+    font-weight: bold;
   }
 </style>
+  
